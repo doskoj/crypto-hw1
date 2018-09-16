@@ -1,6 +1,7 @@
 #define _WIN32_WINNT 0x501
 
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <winsock2.h>
