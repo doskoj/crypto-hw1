@@ -15,21 +15,32 @@
 
 #define DEFAULT_BUFLEN 1
 #define DEFAULT_PORT "2700"
+#define DEFAULT_HOST "localhost"
 
-int __cdecl main(void)
+int main (int argc, char* argv[])
 {
 	WSADATA wsaData;
-	int iResult;
+    SOCKET ConnectSocket = INVALID_SOCKET;
+    struct addrinfo *result = NULL,
+                    *ptr = NULL,
+                    hints;
+    char *sendbuf;
+    char recvbuf[DEFAULT_BUFLEN];
+    int iResult;
+    int recvbuflen = DEFAULT_BUFLEN;
 
-	SOCKET listenSocket = INVALID_SOCKET;
-	SOCKET clientSocket = INVALID_SOCKET;
+	if (argc < 2)
+	{
+		std::cerr << "ERROR: Need port number";
+		exit(1);
+	}
 
-	struct addrinfo *result = NULL;
-	struct addrinfo hints;	
-
-	int iSendResult;
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
+	char* port = argv[1];
+	if (atoi(port) < 0 || atoi(port) > 65535)
+	{
+		std::cerr << "ERROR: Invalid port number";
+		exit(1);
+	}
 
 	// Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
@@ -38,14 +49,13 @@ int __cdecl main(void)
         return 1;
     }
 
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
+    ZeroMemory( &hints, sizeof(hints) );
+    hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
 
     // Resolve the server address and port
-    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+    iResult = getaddrinfo(DEFAULT_HOST, port, &hints, &result);
     if ( iResult != 0 ) {
         printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
