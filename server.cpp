@@ -15,9 +15,9 @@
 #pragma comment(lib, "AdvApi32.lib")
 
 #define DEFAULT_BUFLEN 1
-#define DEFAULT_PORT "2700"
+#define DEFAULT_PORT "2017"
 
-int __cdecl main(void)
+int __cdecl main(int argc, char* argv[])
 {
 	WSADATA wsaData;
 	int iResult;
@@ -32,6 +32,14 @@ int __cdecl main(void)
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
+
+	if (argc < 2)
+	{
+		std::cerr << "usage: " << argv[0] << " key" << std::endl;
+		exit(1);
+	}
+
+	key = atoi(argv[1]);
 
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0)
@@ -112,8 +120,10 @@ int __cdecl main(void)
     }
     while (iResult > 0);
 
+    ofile.close();
+
     iResult = shutdown(clientSocket, SD_SEND);
-    if (iResult = SOCKET_ERROR)
+    if (iResult == SOCKET_ERROR)
     {
     	std::cerr << "shutdown failed with error " << WSAGetLastError() << std::endl;
     	closesocket(clientSocket);
@@ -123,7 +133,6 @@ int __cdecl main(void)
 
     closesocket(clientSocket);
     WSACleanup();
-    ofile.close();
 
     return 0;
 }

@@ -16,37 +16,42 @@
 
 #define DEFAULT_BUFLEN 1
 #define DEFAULT_PORT "2700"
-#define DEFAULT_HOST "localhost"
+#define DEFAULT_HOST "129.161.250.221"
 
 int main (int argc, char* argv[])
 {
 	WSADATA wsaData;
-    SOCKET ConnectSocket = INVALID_SOCKET;
+    SOCKET connectSocket = INVALID_SOCKET;
     struct addrinfo *result = NULL,
                     *ptr = NULL,
                     hints;
-    char *sendbuf;
+    char sendbuf[1];
     char recvbuf[DEFAULT_BUFLEN];
     int iResult;
     int recvbuflen = DEFAULT_BUFLEN;
+    unsigned int key;
+    char* fname;
 
-	if (argc < 2)
+	if (argc < 4)
 	{
-		std::cerr << "ERROR: Need port number";
+		std::cerr << "usage: " << argv[0] << "port file-name key" << std::endl;
 		exit(1);
 	}
 
 	char* port = argv[1];
 	if (atoi(port) < 0 || atoi(port) > 65535)
 	{
-		std::cerr << "ERROR: Invalid port number";
+		std::cerr << "ERROR: Invalid port number" << std::endl;
 		exit(1);
 	}
+
+	fname = argv[2];
+	key = atoi(argv[3]);
 
 	// Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
+        std::cerr << "WSAStartup failed with error: " << iResult << std::endl;
         return 1;
     }
 
@@ -57,9 +62,74 @@ int main (int argc, char* argv[])
 
     // Resolve the server address and port
     iResult = getaddrinfo(DEFAULT_HOST, port, &hints, &result);
-    if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
+    if (iResult != 0) {
+        std::cerr << "getaddrinfo failed with error: " << iResult << std::endl;
         WSACleanup();
         return 1;
     }
+
+    ptr = result;
+    connectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+    if (connectSocket == INVALID_SOCKET)
+    {
+    	std::cerr << "socket failed with error: " << WSAGetLastError() << std::endl;
+    	freeaddrinfo(result);
+    	WSACleanup();
+    	return 1;
+    }
+
+    iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+    if (iResult == SOCKET_ERROR)
+   	{
+   		closesocket(connectSocket);
+   		connectSocket = INVALID_SOCKET;
+   	}
+
+   	if (connectSocket == INVALID_SOCKET)
+   	{
+   		std::cerr << "Unable to connect to server" << std::endl;
+   		WSACleanup();
+   		return 1;
+   	}
+
+   	std::ifstream infile;
+   	infile.open(fname, std::ios::binary | std::ios::in);
+   	if (!infile.is_open())
+   	{
+   		std::cerr << "Unable to open file" << std::endl;
+   		WSACleanup();
+   		return 1;
+   	}
+
+   	Toydes t = Toydes();
+   	char tmp;
+   	while(!infile.eof())
+	{
+		infile.read(&tmp, 1);
+		if (infile.eof()) break;
+		sendbuf[0] = t.encryptByte(tmp, key);
+		iResult = send(connectSocket, sendbuf, 1, 0);
+		if (iResult == SOCKET_ERROR)
+		{
+			std::cerr << "send failed with error " << WSAGetLastError() << std::endl;
+			closesocket(connectSocket);
+			WSACleanup();
+			return 1;
+		}
+	}
+
+	infile.close();
+
+	iResult = shutdown(connectSocket, SD_SEND);
+	if (iResult == SOCKET_ERROR)
+	{
+		std::cerr << "shutdown failed with error " << WSAGetLastError() << std::endl;
+		closesocket(connectSocket);
+		WSACleanup();
+		return 1;
+	}
+
+	closesocket(connectSocket);
+	WSACleanup();
+	return 0;
 }
