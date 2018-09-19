@@ -2,7 +2,7 @@
 
 This assignement consists of two programs, one to encrypt and send a file, and the other to receive and decrypt the file. This program uses a basic two round DES encryption, on 8 bit chunks with a 10 bit key.
 
-##Project Details
+## Project Details
 The program is written in C++, and makes use of the WinSock2 Library.
 
 ### Toydes Class
