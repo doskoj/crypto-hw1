@@ -11,7 +11,7 @@ The actual DES implementation is contained in a class called Toydes, which consi
 ### Server Implementation
 The server is implemented in server.cpp which imports the Toydes Class mentioned above. Using the Winsock2 Library, the server listens on a port for incomming connections which it receives and decrypts using a key provided by the user. The bytes it receives are saved to a file after being decrypted.
 
-### Client Implementaion
+### Client Implementation
 The client is implemented in client.cpp, which works very much the same way as the server, using the Toydes Class and WinSock2 Library. The client creates a socket and attempts to connect to the port and server provided by the user, and with a successful connection, sends the file specified by the user that is encrypted byte by byte using the key provided.
 
 
