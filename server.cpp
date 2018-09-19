@@ -32,14 +32,16 @@ int __cdecl main(int argc, char* argv[])
 	int iSendResult;
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
+	char* port;
 
-	if (argc < 2)
+	if (argc < 3)
 	{
-		std::cerr << "usage: " << argv[0] << " key" << std::endl;
+		std::cerr << "usage: " << argv[0] << " port key" << std::endl;
 		exit(1);
 	}
 
-	key = atoi(argv[1]);
+	key = atoi(argv[2])&0x3ff;
+	port = argv[1];
 
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0)
@@ -54,7 +56,7 @@ int __cdecl main(int argc, char* argv[])
     hints.ai_protocol = IPPROTO_TCP;
     hints.ai_flags = AI_PASSIVE;
 
-    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+    iResult = getaddrinfo(NULL, port, &hints, &result);
     if (iResult != 0)
     {
         std::cerr << "getaddrinfo failed with error: " << iResult << std::endl;

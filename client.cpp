@@ -31,22 +31,24 @@ int main (int argc, char* argv[])
     int recvbuflen = DEFAULT_BUFLEN;
     unsigned int key;
     char* fname;
+    char* server;
 
-	if (argc < 4)
+	if (argc < 5)
 	{
-		std::cerr << "usage: " << argv[0] << "port file-name key" << std::endl;
+		std::cerr << "usage: " << argv[0] << "server-address port file-name key" << std::endl;
 		exit(1);
 	}
 
-	char* port = argv[1];
+	char* port = argv[2];
 	if (atoi(port) < 0 || atoi(port) > 65535)
 	{
 		std::cerr << "ERROR: Invalid port number" << std::endl;
 		exit(1);
 	}
 
-	fname = argv[2];
-	key = atoi(argv[3]);
+	server = argv[1];
+	fname = argv[3];
+	key = atoi(argv[4])&0x3ff;
 
 	// Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
@@ -61,7 +63,7 @@ int main (int argc, char* argv[])
     hints.ai_protocol = IPPROTO_TCP;
 
     // Resolve the server address and port
-    iResult = getaddrinfo(DEFAULT_HOST, port, &hints, &result);
+    iResult = getaddrinfo(server, port, &hints, &result);
     if (iResult != 0) {
         std::cerr << "getaddrinfo failed with error: " << iResult << std::endl;
         WSACleanup();
