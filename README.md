@@ -30,9 +30,9 @@ g++ server.cpp toydes.cpp -o server.exe -lws2_32
 ### Running the Program
 Each program is run from commandline, specifying the arguments to use. The server must be started first.
 ```
-$ ./server <port> <key>
+$ ./server <port> <file-name> <key>
 ```
-This designates the port for the server to listen on, as well as the key that it will use to decrypt any incomming messages. Next the client is run.
+This designates the port for the server to listen on, the file name under which to save the received file, as well as the key that it will use to decrypt any incomming messages. Next the client is run.
 ```
 $ ./client <server-address> <port> <file-name> <key>
 ```

@@ -25,7 +25,7 @@ int main (int argc, char* argv[])
     struct addrinfo *result = NULL,
                     *ptr = NULL,
                     hints;
-    char sendbuf[1];
+    char sendbuf[32];
     char recvbuf[DEFAULT_BUFLEN];
     int iResult;
     int recvbuflen = DEFAULT_BUFLEN;
@@ -35,7 +35,7 @@ int main (int argc, char* argv[])
 
 	if (argc < 5)
 	{
-		std::cerr << "usage: " << argv[0] << "server-address port file-name key" << std::endl;
+		std::cerr << "usage: " << argv[0] << " server-address port file-name key" << std::endl;
 		exit(1);
 	}
 

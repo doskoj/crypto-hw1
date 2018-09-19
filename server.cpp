@@ -14,7 +14,7 @@
 #pragma comment(lib, "Mswsock.lib")
 #pragma comment(lib, "AdvApi32.lib")
 
-#define DEFAULT_BUFLEN 1
+#define DEFAULT_BUFLEN 32
 #define DEFAULT_PORT "2017"
 
 int __cdecl main(int argc, char* argv[])
@@ -33,15 +33,17 @@ int __cdecl main(int argc, char* argv[])
 	char recvbuf[DEFAULT_BUFLEN];
 	int recvbuflen = DEFAULT_BUFLEN;
 	char* port;
+	char* fname;
 
-	if (argc < 3)
+	if (argc < 4)
 	{
-		std::cerr << "usage: " << argv[0] << " port key" << std::endl;
+		std::cerr << "usage: " << argv[0] << " port file-name key" << std::endl;
 		exit(1);
 	}
 
-	key = atoi(argv[2])&0x3ff;
+	key = atoi(argv[3])&0x3ff;
 	port = argv[1];
+	fname = argv[2];
 
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0)
@@ -101,12 +103,12 @@ int __cdecl main(int argc, char* argv[])
     }
 
     std::ofstream ofile;
-    ofile.open("file.txt", std::ios::binary | std::ios::out);
     Toydes t = Toydes();
     unsigned char tmp;
+    ofile.open(fname, std::ios::binary | std::ios::out);
     do
     {
-    	iResult = recv(clientSocket, recvbuf, recvbuflen, 0);
+    	iResult = recv(clientSocket, recvbuf, 1, 0);
     	if (iResult > 0)
     	{
 			tmp = t.decryptByte(recvbuf[0], key);
