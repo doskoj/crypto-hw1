@@ -9,16 +9,16 @@ The program is written in C++, and makes use of the WinSock2 Library.
 The actual DES implementation is contained in a class called Toydes, which consists of two files: toydes.h and toydes.cpp. The class has two public functions encrypt() and decrypt(). Each function takes two arguments, a message to encrypt or decrypt, in the form of an unsigned char, and a key with which to encrypt or decrypt the message, in the form of an unsigned int. The result is returned as an unsigned char.
 
 ### Server Implementation
-The server is implemented in server.cpp which imports the Toydes Class mentioned above. Using the Winsock2 Library, the server listens on a port for incomming connections which it receives and decrypts using a key provided by the user. The bytes it receives are saved to a file after being decrypted.
+The server is implemented in server.cpp which imports the Toydes Class mentioned above. Using the Winsock2 Library, the server listens on a port for incomming connections which it receives and decrypts using a key provided by the user. The bytes it receives are written to a file after being decrypted. After server stops receiving data, it closes the connection and saves the file.
 
 ### Client Implementation
-The client is implemented in client.cpp, which works very much the same way as the server, using the Toydes Class and WinSock2 Library. The client creates a socket and attempts to connect to the port and server provided by the user, and with a successful connection, sends the file specified by the user that is encrypted byte by byte using the key provided.
+The client is implemented in client.cpp, which works very much the same way as the server, using the Toydes Class and WinSock2 Library. The client creates a socket and attempts to connect to the port and server provided by the user, and with a successful connection, sends the file specified by the user that is encrypted byte by byte using the key provided. Once it is done sending the file, the connection is closed.
 
 
 ## Usage
 
 ### Building the Project
-The project is compiled into two separate programs, the client and the server, using g++. The client is compiled with
+The project is compiled into two separate programs, the client and the server, using g++. The program uses Windows Sockets, so it is important to be compiled on a computer that supports this. The client is compiled with
 ```
 g++ client.cpp toydes.cpp -o client.exe -lws2_32
 ```
