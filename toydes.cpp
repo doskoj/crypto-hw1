@@ -2,7 +2,7 @@
 #include <vector>
 #include "toydes.h"
 
-/*
+
 std::string Toydes::cts(unsigned int c, unsigned int length) {
 	std::string s = std::string(length, '0');
 	for (unsigned int i = 0; i < length; i++) {
@@ -10,7 +10,7 @@ std::string Toydes::cts(unsigned int c, unsigned int length) {
 	}
 	return s;
 }
-*/
+
 /*
  * Function to get the output of an S box Specified in the argument, taking the input number
  */
